@@ -1,11 +1,13 @@
 package com.team2.cafein.controller;
 
 
+import com.team2.cafein.dto.ResponseMessageDto;
 import com.team2.cafein.model.Bookmark;
 import com.team2.cafein.service.BookmarkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -14,9 +16,27 @@ public class BookmarkController {
     private final BookmarkService bookmarkService;
 
     //모든 북마크 포스트 갖고오기
-    @GetMapping("/api/bookmark/{userId}")
-    public List<Bookmark> getPosts(@PathVariable Long userId){
-        return bookmarkService.getPosts(userId);
+    @GetMapping("/api/bookmark/{userId}") // "api/bookmark/1"
+   public List<Post> getPosts(@PathVariable Long userId){
+
+        return bookmarkService.getBooks(userId);
+//        return bookmarkService.getPosts(userId);
+
+//        // 로그인 되어있는 userId로 Bookmark 테이블에서 select로 리스트 배열 받아오기
+//        List<Bookmark> bookmarks = bookmarkService.getPosts(userId);
+//
+//        List<Post> responsePosts = new ArrayList<>();   // 여기는 응답할 게시글 목록을 위한 리스트 선언
+//
+//        for (Bookmark bookmark : bookmarks) {
+//            Long postId = bookmark.getPostId();
+//            Post post = postRepository.findByPostId(postId);
+//            responsePosts.add(post);
+//        }
+
+//        for (int i = 0; i < posts.size(); i++) {
+//            Bookmark bookmark = posts.get(i);
+//            responsePosts.add(post);
+//        }
     }
 
     @GetMapping("/api/bookmark/{postId}") // 유저 아이디 어디서 갖고오냐 ...
@@ -39,10 +59,9 @@ public class BookmarkController {
 
 
     @DeleteMapping("/api/bookmark/{bookmarkId}")
-    public String deleteBookmark(@PathVariable Long bookmarkId)  {
+    public ResponseMessageDto deleteBookmark(@PathVariable Long bookmarkId)  {
         return bookmarkService.deleteBookmark(bookmarkId);
     }
-
 }
 // 북마크 보기. = POST ID 의 리스트를 주는것이 아니고 for 문을 돌려서 POST 데이터를 줘야한다
 // 북마크 설정은 POST ID 와 USER ID 만 저장하면 된다.
