@@ -1,5 +1,6 @@
 package com.team2.cafein.model;
 
+import com.team2.cafein.dto.SignupRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,4 +24,10 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    public User(SignupRequestDto requestDto) {
+        this.nickname = requestDto.getNickname();
+        this.email = requestDto.getEmail();
+        this.password = requestDto.getPassword();
+    }
 }
