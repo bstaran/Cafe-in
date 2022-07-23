@@ -4,10 +4,7 @@ package com.team2.cafein.controller;
 import com.team2.cafein.model.Bookmark;
 import com.team2.cafein.service.BookmarkService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,11 +20,22 @@ public class BookmarkController {
     }
 
     @GetMapping("/api/bookmark/{postId}") // 유저 아이디 어디서 갖고오냐 ...
-    public Bookmark savePost(@PathVariable Long postId){
-        return bookmarkService.savePost(postId);
+    public Bookmark savePost(@PathVariable Long postId,Long userId){
+        return bookmarkService.savePost(userId,postId);
     }
 
-
+//    // 댓글 작성
+//    @PostMapping("/api/reply")
+//    public String createReply(@RequestBody ReplyRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        // 로그인 되어 있는 ID
+//        if (userDetails != null) {
+//            Long userId = userDetails.getUser().getId();
+//            String username = userDetails.getUser().getUsername();
+//            ReplyService.createReply(requestDto, username, userId);
+//            return "댓글 작성 완료";
+//        }
+//        return "로그인이 필요한 기능입니다.";
+//    }
 
 
     @DeleteMapping("/api/bookmark/{bookmarkId}")
