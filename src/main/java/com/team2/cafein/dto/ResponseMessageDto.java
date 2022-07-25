@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResponseMessageDto {
-    private boolean ok;
+    private boolean status;
     private String message;
 
 }

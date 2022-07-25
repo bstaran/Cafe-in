@@ -20,7 +20,7 @@ public class UserService {
         userRepository.save(user);
 
         ResponseMessageDto responseMessageDto = new ResponseMessageDto();
-        responseMessageDto.setOk(true);
+        responseMessageDto.setStatus(true);
         responseMessageDto.setMessage("회원가입 성공");
         return responseMessageDto;
     }
@@ -34,7 +34,7 @@ public class UserService {
             throw new IllegalArgumentException("아이디나 비밀번호 확인");
         }
 
-        responseMessageDto.setOk(true);
+        responseMessageDto.setStatus(true);
         responseMessageDto.setMessage("로그인 성공");
         return responseMessageDto;
     }
