@@ -18,16 +18,6 @@ public class PostController {
 
     private final PostService postService;
 
-    // 게시글 등록
-//    @PostMapping("/api/post")
-//    public ResponseMessageDto createPost(@RequestBody PostRequestDto requestDto, MultipartFile file) throws Exception {
-//
-//        /* 파일을 업로드 하지 않았을 경우 처리 */
-//        if (file.isEmpty()) {
-//        }
-//        return postService.createPost(requestDto, file);
-//    }
-
     @GetMapping("/api/post")
     public PostRequestDto postForm(Model model) {
         PostRequestDto postRequestDto = new PostRequestDto();
@@ -36,14 +26,16 @@ public class PostController {
     }
 
     @PostMapping("/api/post")
-    public ResponseMessageDto createPost(@ModelAttribute("postRequestDto") PostRequestDto requestDto) throws Exception {
+    public ResponseMessageDto createPost(
+            @RequestPart(value = "postRequestDto") PostRequestDto requestDto,
+            @RequestPart(value = "file") MultipartFile file) throws Exception {
 
         /* 파일을 업로드 하지 않았을 경우 처리 */
-        if (requestDto.getCoffeeImage().isEmpty()) {
+        if (file.isEmpty()) {
         }
 //        String nickname = userDetails.getNicename();
 //        return postService.createPostTest(requestDto, nickname);
-        return postService.createPostTest(requestDto);
+        return postService.createPostTest(requestDto, file);
 
     }
 
@@ -59,7 +51,6 @@ public class PostController {
     // 게시글 삭제
     @DeleteMapping("/api/post/{postId}")
     public ResponseMessageDto deletePost(@PathVariable Long postId) {
-
         return postService.deletePost(postId);
     }
 

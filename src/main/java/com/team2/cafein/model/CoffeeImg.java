@@ -1,6 +1,5 @@
 package com.team2.cafein.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,14 +10,13 @@ import javax.persistence.*;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "post_img")
 public class CoffeeImg {
 
     @Id
     @GeneratedValue
-    private Long coffeeImgId;
+    private Long id;
 
-    private String imageName;     // 실제 로컬에 저장된 이미지 파일 이름
+    private String imageName;     // 실제 로컬에 저장된 이미지 파일 이름 // 실제로 로컬에 저장할 이미지 파일명
 
     private String originalImageName;  // 업로드했던 이미지 파일 초기 이름 // 원본 이미지 파일명
 
@@ -43,5 +41,11 @@ public class CoffeeImg {
                 .imageUrl(itemImage.getImageUrl())
                 .post(post)
                 .build();
+    }
+
+    public void initPostInfo() {
+        this.originalImageName = "";
+        this.imageName = "";
+        this.imageUrl = "";
     }
 }

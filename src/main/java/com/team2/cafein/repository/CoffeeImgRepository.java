@@ -8,7 +8,8 @@ import java.util.List;
 
 public interface CoffeeImgRepository extends JpaRepository<CoffeeImg, Long> {
 
-    List<CoffeeImg> findByPostOrderByCoffeeImgIdAsc(Post post);
+//    List<CoffeeImg> findByPostOrderByCoffeeImgIdAsc(Post post);
+    List<CoffeeImg> findByPostOrderByIdAsc(Post post);
 
     CoffeeImg findByPost(Post post);
 

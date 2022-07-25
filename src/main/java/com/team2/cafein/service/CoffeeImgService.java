@@ -45,8 +45,8 @@ public class CoffeeImgService {
         coffeeImgRepository.save(savePostImage);
     }
 
-    public List<CoffeeImg> findByPostOrderByCoffeeImgIdAsc(Post post) {
-        return coffeeImgRepository.findByPostOrderByCoffeeImgIdAsc(post);
+    public List<CoffeeImg> findByPostOrderByIdAsc(Post post) {
+        return coffeeImgRepository.findByPostOrderByIdAsc(post);
     }
 
 //    @Transactional
@@ -66,14 +66,14 @@ public class CoffeeImgService {
 //        coffeeImg.updatePostImage(originalFilename, storeFileName, imageUrl);
 //    }
 //
-//    @Transactional
-//    public void deletePostImage(CoffeeImg coffeeImg) throws IOException {
-//        // 기존 이미지 파일 삭제
-//        String fileUploadUrl = fileService.getFullFileUploadPath(coffeeImg.getImgName());
-//        fileService.deleteFile(fileUploadUrl);
-//        // 이미지 정보 초기화
-//        coffeeImg.initPostInfo();
-//    }
+    @Transactional
+    public void deletePostImage(CoffeeImg coffeeImg) throws IOException {
+        // 기존 이미지 파일 삭제
+        String fileUploadUrl = fileService.getFullFileUploadPath(coffeeImg.getImageName());
+        fileService.deleteFile(fileUploadUrl);
+        // 이미지 정보 초기화
+        coffeeImg.initPostInfo();
+    }
 
     public CoffeeImg findByPost(Post post) {
         return coffeeImgRepository.findByPost(post);
