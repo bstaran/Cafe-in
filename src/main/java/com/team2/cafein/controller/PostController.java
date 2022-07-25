@@ -3,10 +3,12 @@ package com.team2.cafein.controller;
 import com.team2.cafein.dto.PostRequestDto;
 import com.team2.cafein.dto.ResponseMessageDto;
 import com.team2.cafein.model.Post;
-import com.team2.cafein.model.User;
 import com.team2.cafein.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

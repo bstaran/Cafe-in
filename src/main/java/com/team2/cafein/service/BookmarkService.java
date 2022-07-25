@@ -2,7 +2,9 @@ package com.team2.cafein.service;
 
 import com.team2.cafein.dto.ResponseMessageDto;
 import com.team2.cafein.model.Bookmark;
+import com.team2.cafein.model.Post;
 import com.team2.cafein.repository.BookmarkRepository;
+import com.team2.cafein.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ import java.util.List;
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
+    private final PostRepository postRepository;
 
     @Transactional
     public List<Post> getPosts(Long userId) {
@@ -40,8 +43,8 @@ public class BookmarkService {
         bookmarkRepository.save(bookmark);
 
         ResponseMessageDto responseMessageDto = new ResponseMessageDto();
-        responseMessageDto.setOk("ok");  //불리언으로 받아와서 셋팅 . 기본값을 false 로 놓고 ?
-        if (ResponseMessageDto.getOk().equals(true)) {
+        responseMessageDto.setStatus(true);//불리언으로 받아와서 셋팅 . 기본값을 false 로 놓고 ?
+        if (responseMessageDto.isStatus()==true) {
             responseMessageDto.setMessage("등록성공");
         } else {
             responseMessageDto.setMessage("등록실패");
@@ -57,11 +60,12 @@ public class BookmarkService {
 
             // 응답 객체 만들기
             ResponseMessageDto responseMessageDto = new ResponseMessageDto();
-            responseMessageDto.setOk("ok");
-            if (ResponseMessageDto.getOk().equals(true)) {
+            responseMessageDto.setStatus(true);
+            if (responseMessageDto.isStatus()==true) {
                 responseMessageDto.setMessage("등록성공");
             } else {
                 responseMessageDto.setMessage("등록실패");
+
             }
             return responseMessageDto;
         }
