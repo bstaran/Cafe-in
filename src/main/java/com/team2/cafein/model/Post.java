@@ -25,22 +25,20 @@ public class Post extends Timestamped {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
-    private String fileName;
-
-    @Column(nullable = false)
-    private String filePath;
+//    @Column(nullable = false)
+//    private String fileName;
+//
+//    @Column(nullable = false)
+//    private String filePath;
 
     private int bookmarkCount;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     public Post(PostRequestDto requestDto, String fileName, String filePath) {
         this.cafeName = requestDto.getCafeName();
         this.content = requestDto.getContent();
-        this.fileName = fileName;
-        this.filePath = filePath;
         this.bookmarkCount = 0;
 //        setUser(user);
     }

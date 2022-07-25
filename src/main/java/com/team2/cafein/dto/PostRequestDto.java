@@ -21,7 +21,7 @@ public class PostRequestDto {
     private String content;
 
 //    private List<MultipartFile> coffeeImageFiles;
-    private MultipartFile coffeeImage;
+//    private MultipartFile coffeeImage;
 
     public Post toEntity() {
         return Post.builder()
