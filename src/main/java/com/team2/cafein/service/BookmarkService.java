@@ -29,7 +29,8 @@ public class BookmarkService {
 
         for (Bookmark bookmark : bookmarks) { //for 문을 돌리면서 POST ID 에대응되는 post의 내용을 List<post> 에 담아서 리턴
             Long postId = bookmark.getPostId();
-            Post post = postRepository.findByPostId(postId);
+            Post post = postRepository.findById(postId)
+                    .orElseThrow(() -> new NullPointerException("ID값 확인해주세여"));
             responsePosts.add(post);
         }
         return responsePosts;
