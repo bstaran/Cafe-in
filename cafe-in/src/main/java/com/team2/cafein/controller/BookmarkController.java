@@ -16,11 +16,11 @@ public class BookmarkController {
     private final BookmarkService bookmarkService;
 
     //모든 북마크 포스트 갖고오기
-    @GetMapping("/api/bookmark/{userId}") // "api/bookmark/1"
-   public List<Post> getPosts(@PathVariable Long userId){
+    @GetMapping("/api/bookmark/{userId}")
+   public List<Post> getBookmarkedPost(@PathVariable Long userId){
 
-        return bookmarkService.getBooks(userId);
-//        return bookmarkService.getPosts(userId);
+        return bookmarkService.getPosts(userId); //서비스의 getPosts 실행 결과값을 리턴으로 받는다. (List<post>) 의형식으로
+
 
 //        // 로그인 되어있는 userId로 Bookmark 테이블에서 select로 리스트 배열 받아오기
 //        List<Bookmark> bookmarks = bookmarkService.getPosts(userId);
@@ -40,7 +40,7 @@ public class BookmarkController {
     }
 
     @GetMapping("/api/bookmark/{postId}") // 유저 아이디 어디서 갖고오냐 ...
-    public Bookmark savePost(@PathVariable Long postId,Long userId){
+    public ResponseMessageDto savePost(@PathVariable Long postId,Long userId){
         return bookmarkService.savePost(userId,postId);
     }
 

@@ -17,14 +17,14 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
 
     @Transactional
-    public List<Post> getBooks(Long userId) {
+    public List<Post> getPosts(Long userId) {
 
         // 로그인 되어있는 userId로 Bookmark 테이블에서 select로 리스트 배열 받아오기
-        List<Bookmark> bookmarks = bookmarkRepository.getBooks(userId);
+        List<Bookmark> bookmarks = bookmarkRepository.findAllByUserId(userId);
 
         List<Post> responsePosts = new ArrayList<>();   // 여기는 응답할 게시글 목록을 위한 리스트 선언
 
-        for (Bookmark bookmark : bookmarks) {
+        for (Bookmark bookmark : bookmarks) { //for 문을 돌리면서 POST ID 에대응되는 post의 내용을 List<post> 에 담아서 리턴
             Long postId = bookmark.getPostId();
             Post post = postRepository.findByPostId(postId);
             responsePosts.add(post);
@@ -33,25 +33,38 @@ public class BookmarkService {
 
     }
 
-    public Bookmark savePost(Long userId, Long postId) {
+    public ResponseMessageDto savePost(Long userId, Long postId) {
 
         //로그인 정보에서 userid 갖고 와서 +
         Bookmark bookmark = new Bookmark(userId, postId);
         bookmarkRepository.save(bookmark);
-        return bookmark;
 
-    }
-
-    public ResponseMessageDto deleteBookmark(Long bookmarkId) {
-        // 비지니스 로직 구간
-        bookmarkRepository.deleteById(bookmarkId);
-        // ---------------------------
-
-        // 응답 객체 만들기
         ResponseMessageDto responseMessageDto = new ResponseMessageDto();
-        responseMessageDto.setOk("ok");
-        responseMessageDto.setMessage("북마크 해제 완료");
+        responseMessageDto.setOk("ok");  //불리언으로 받아와서 셋팅 . 기본값을 false 로 놓고 ?
+        if (ResponseMessageDto.getOk().equals(true)) {
+            responseMessageDto.setMessage("등록성공");
+        } else {
+            responseMessageDto.setMessage("등록실패");
+
+        }
         return responseMessageDto;
     }
-}
+
+        public ResponseMessageDto deleteBookmark (Long bookmarkId){
+            // 비지니스 로직 구간
+            bookmarkRepository.deleteById(bookmarkId);
+            // ---------------------------
+
+            // 응답 객체 만들기
+            ResponseMessageDto responseMessageDto = new ResponseMessageDto();
+            responseMessageDto.setOk("ok");
+            if (ResponseMessageDto.getOk().equals(true)) {
+                responseMessageDto.setMessage("등록성공");
+            } else {
+                responseMessageDto.setMessage("등록실패");
+            }
+            return responseMessageDto;
+        }
+    }
+
 
