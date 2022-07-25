@@ -1,19 +1,21 @@
 package com.team2.cafein.model;
 
+import com.team2.cafein.base.Timestamped;
 import com.team2.cafein.dto.SignupRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@NoArgsConstructor
+@Getter
+public class User extends Timestamped {
+
+    @Id @GeneratedValue
+    @Column(name = "post_id")
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -24,6 +26,11 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    // 여기서의 "user"는 Post에 있는 user필드에 의해서 매핑된 거울 역할
+    // mappedBy 속성 : 나는 주인이 아니에요. 나는 연견관계의 거울이에요.(읽기 전용)
+    @OneToMany(mappedBy = "user")
+    private List<Post> posts = new ArrayList<>();
 
     public User(SignupRequestDto requestDto) {
         this.nickname = requestDto.getNickname();
