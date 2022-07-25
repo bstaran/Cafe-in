@@ -45,7 +45,7 @@ public class PostService {
         postRepository.save(post);
 
         ResponseMessageDto responseMessageDto = new ResponseMessageDto();
-        responseMessageDto.setOk("ok");
+        responseMessageDto.setOk(true);
         responseMessageDto.setMessage("게시글 등록 성공");
         return responseMessageDto;
     }
