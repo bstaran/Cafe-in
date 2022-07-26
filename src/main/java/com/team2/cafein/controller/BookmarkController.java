@@ -1,10 +1,12 @@
 package com.team2.cafein.controller;
 
 
+import com.team2.cafein.config.auth.UserDetailsImpl;
 import com.team2.cafein.dto.ResponseMessageDto;
 import com.team2.cafein.model.Post;
 import com.team2.cafein.service.BookmarkService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,8 +27,9 @@ public class BookmarkController {
         return bookmarkService.getPosts(userId); //서비스의 getPosts 실행 결과값을 리턴으로 받는다. (List<post>) 의형식으로
     }
 
-    @GetMapping("/api/bookmark/{postId}") // 유저 아이디 어디서 갖고오냐 ...
-    public ResponseMessageDto savePost(@PathVariable Long postId,Long userId){
+    @GetMapping("/api/bookmark/{postId}")
+    public ResponseMessageDto savePost(@PathVariable Long postId,@AuthenticationPrincipal UserDetailsImpl userDetails){
+        Long userId = userDetails.getUser().getId();
         return bookmarkService.savePost(userId,postId);
     }
 
