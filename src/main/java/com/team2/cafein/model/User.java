@@ -15,7 +15,7 @@ import java.util.List;
 public class User extends Timestamped {
 
     @Id @GeneratedValue
-    @Column(name = "post_id")
+    @Column(name = "user_id")
     private Long id;
 
     @Column(nullable = false, unique = true)
