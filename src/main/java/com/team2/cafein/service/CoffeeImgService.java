@@ -23,12 +23,12 @@ public class CoffeeImgService {
     private final String IMAGE_URL_PREFIX = "/images/";
 
     @Transactional
-    public void savePostImage(Post post, MultipartFile postImageFile) throws IOException {
-        savePostImageMethod(post, postImageFile);
+    public CoffeeImg savePostImage(Post post, MultipartFile postImageFile) throws IOException {
+        return savePostImageMethod(post, postImageFile);
     }
 
     @Transactional
-    public void savePostImageMethod(Post post, MultipartFile postImageFile) throws IOException {
+    public CoffeeImg savePostImageMethod(Post post, MultipartFile postImageFile) throws IOException {
 
         UploadFile uploadFile = fileService.storeFile(postImageFile);
         String fileUploadUrl = uploadFile.getFileUploadUrl();
@@ -43,10 +43,14 @@ public class CoffeeImgService {
                 .imageName(storeFileName)
                 .originalImageName(originalFilename)
                 .imageUrl(imageUrl)
+                .post(post)
                 .build();
+        System.out.println("coffeeImg.toString() : " + coffeeImg.getPost().toString());
 
         CoffeeImg savePostImage = CoffeeImg.createPostImage(coffeeImg, post);
-        coffeeImgRepository.save(savePostImage);
+        System.out.println("savePostImage : " + savePostImage.getPost().toString()); // 둘이 일치 확인완료
+
+        return coffeeImgRepository.save(savePostImage);
     }
 
     public List<CoffeeImg> findByPostOrderByIdAsc(Post post) {
