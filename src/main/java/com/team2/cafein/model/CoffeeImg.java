@@ -54,4 +54,5 @@ public class CoffeeImg {
         this.imageName = imageName;
         this.imageUrl = imageUrl;
     }
+    //
 }

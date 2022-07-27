@@ -16,4 +16,5 @@ public class MainPostDto {
     private String cafeName;   // 카페이름
     private String content; // 내용
     private String imgUrl;  // 이미지 경로
+    //
 }

@@ -82,4 +82,5 @@ public class Post extends Timestamped {
         this.content = updatePost.getContent();
         this.bookmarkCount = updatePost.getBookmarkCount();
     }
+    //
 }
