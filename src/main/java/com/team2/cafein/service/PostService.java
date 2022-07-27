@@ -7,6 +7,7 @@ import com.team2.cafein.model.CoffeeImg;
 import com.team2.cafein.model.Post;
 import com.team2.cafein.model.User;
 import com.team2.cafein.repository.BookmarkRepository;
+import com.team2.cafein.repository.CoffeeImgRepository;
 import com.team2.cafein.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final CoffeeImgRepository coffeeImgRepository;
     private final CoffeeImgService coffeeImgService;
     private final BookmarkRepository bookmarkRepository;
     private final UserService userService;
@@ -45,7 +48,8 @@ public class PostService {
         postRepository.save(savePost);
 
         // 게시글 이미지 등록
-        coffeeImgService.savePostImage(savePost, file);
+        CoffeeImg coffeeImg = coffeeImgService.savePostImage(savePost, file);
+        savePost.setCoffeeImg(coffeeImg);
 
         ResponseMessageDto responseMessageDto = new ResponseMessageDto();
         responseMessageDto.setStatus(true);
@@ -56,30 +60,34 @@ public class PostService {
     /**
      * 게시글 수정
      */
-    public UpdatePostDto getUpdatePostDto(Long PostId) {
-        Post Post = postRepository.findById(PostId).orElseThrow(
+    public UpdatePostDto getUpdatePostDto(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(
                 () -> new NullPointerException("아이디가 존재하지 않습니다."));
 
-        CoffeeImg coffeeImg = coffeeImgService.findByPost(Post);
-        return UpdatePostDto.of(Post, coffeeImg);
+        CoffeeImg coffeeImg = coffeeImgService.findByPost(post);
+        return UpdatePostDto.of(post, coffeeImg);
     }
 
-    public UpdatePostDto.PostImageDto getPostImageDto(Long PostId) {
-        Post Post = postRepository.findById(PostId).orElseThrow(
+    /**
+     * 하나의 게시글 정보 가져가기
+     */
+
+    public UpdatePostDto.PostImageDto getPostImageDto(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(
                 () -> new NullPointerException("존재하지 않는 게시글입니다."));
 
 //        CoffeeImg coffeeImg = coffeeImgService.findByItemOrderByItemImageIdAsc(item);
-        CoffeeImg coffeeImg = coffeeImgService.findByPost(Post);
+        CoffeeImg coffeeImg = coffeeImgService.findByPost(post);
         return UpdatePostDto.PostImageDto.of(coffeeImg);
     }
 
     @Transactional
     public void updatePost(UpdatePostDto updatePostDto, MultipartFile file) throws IOException {
         // 게시글 업데이트
-        Post Post = updatePostInfo(updatePostDto);
+        Post post = updatePostInfo(updatePostDto);
 
         // 커피 이미지 업데이트
-        updatePostImage(updatePostDto, Post, file);
+        updatePostImage(updatePostDto, post, file);
     }
 
     private Post updatePostInfo(UpdatePostDto updatePostDto) {
@@ -89,22 +97,22 @@ public class PostService {
     }
 
     @Transactional
-    public Post updatePostInformation(Long PostId, Post updatePost) {
-        Post savedPost = postRepository.findById(PostId)
+    public Post updatePostInformation(Long postId, Post updatePost) {
+        Post savedPost = postRepository.findById(postId)
                 .orElseThrow(() -> new NullPointerException("없는 게시판"));
         savedPost.updatePost(updatePost);
         return savedPost;
     }
 
-    private void updatePostImage(UpdatePostDto updatePostDto, Post Post, MultipartFile file) throws IOException {
+    private void updatePostImage(UpdatePostDto updatePostDto, Post post, MultipartFile file) throws IOException {
 
         // 데이터베이스에 저장된 상품 이미지 정보
-        CoffeeImg coffeeImg = coffeeImgService.findByPost(Post);
+        CoffeeImg coffeeImg = coffeeImgService.findByPost(post);
         String originalImageName = updatePostDto.getOriginalImageName(); // 상품 수정 화면 조회 시에 있던 상품 이미지명 정보
-        MultipartFile PostImageFile = file; // 상품 파일 이미지 정보
+        MultipartFile postImageFile = file; // 상품 파일 이미지 정보
 
-        if (!PostImageFile.isEmpty()) {  // 기존 파일 수정 or 신규 파일 등록 처리
-            coffeeImgService.updatePostImage(coffeeImg, PostImageFile);
+        if (!postImageFile.isEmpty()) {  // 기존 파일 수정 or 신규 파일 등록 처리
+            coffeeImgService.updatePostImage(coffeeImg, postImageFile);
         } else if (!StringUtils.hasText(originalImageName) &&
                 StringUtils.hasText(coffeeImg.getOriginalImageName())) { // 기존 파일 삭제
             coffeeImgService.deletePostImage(coffeeImg);
@@ -138,6 +146,7 @@ public class PostService {
 
         List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
 
+        // nickName, createdAt 추가적으로 넣어야함
         List<PostResponseDto> listPost = new ArrayList<>();
         for (Post post : posts) {
             String imageUrl = post.getCoffeeImg().getImageUrl();
@@ -153,19 +162,43 @@ public class PostService {
     /**
      * 게시글 삭제
      */
-    public ResponseMessageDto deletePost(Long PostId) {
-        postRepository.deleteById(PostId);
-//        PostRepository.find
+    @Transactional
+    public ResponseMessageDto deletePost(Long postId, String userName) throws IOException {
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+
+        CoffeeImg coffeeImg = coffeeImgService.findByPost(post);
+        System.out.println("coffeeImg : " + coffeeImg); // ok
+
+        String nickName = post.getUser().getNickname();
+        System.out.println("nickName : " + nickName); // ok
+        System.out.println("userName : " + userName); // ok
+
+        if (Objects.equals(nickName, userName)) {
+            // 삭제
+            coffeeImgService.deletePostImage(coffeeImg);
+            coffeeImgRepository.deleteById(coffeeImg.getId());
+            bookmarkRepository.deleteByPostId(postId);
+            postRepository.delete(post);
+
+        }else new IllegalArgumentException("작성한 유저가 아닙니다.");
+
         ResponseMessageDto responseMessageDto = new ResponseMessageDto();
         responseMessageDto.setStatus(true);
         responseMessageDto.setMessage("게시글 삭제 성공");
         return responseMessageDto;
     }
 
-    public Post findOne(Long PostId) {
-        Post Post = postRepository.findById(PostId).orElseThrow(
+    public PostResponseDto findOne(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(
                 () -> new NullPointerException("존재하지 않는 게시글입니다."));
-        return Post;
+        String imageUrl = post.getCoffeeImg().getImageUrl();
+
+        PostResponseDto postResponseDto = PostResponseDto.builder()
+                .post(post)
+                .imageUrl(imageUrl)
+                .build();
+        return postResponseDto;
     }
     //
 }

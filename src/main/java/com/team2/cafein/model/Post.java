@@ -33,18 +33,14 @@ public class Post extends Timestamped {
     @OneToOne(mappedBy = "post")
     private CoffeeImg coffeeImg;
 
-    // 안쓸듯
-    public Post(PostRequestDto requestDto) {
-        this.cafeName = requestDto.getCafeName();
-        this.content = requestDto.getContent();
-        this.bookmarkCount = 0;
-//        setUser(user);
-    }
-
     //== 연관관계 (편의) 메서드==// 양방향 연관관계 세팅을 까먹지않고 할수있는 장점
     public void setUser(User user) {
         this.user = user;
         user.getPosts().add(this);
+    }
+
+    public void setCoffeeImg(CoffeeImg coffeeImg) {
+        this.coffeeImg = coffeeImg;
     }
 
     // 북마크 증가
@@ -59,15 +55,6 @@ public class Post extends Timestamped {
         setUser(user);
         this.bookmarkCount = bookmarkCount;
     }
-
-//    public static Post createPost(Post post) {
-//        return Post.builder()
-//                .cafeName(post.getCafeName())
-//                .content(post.getContent())
-////                .user(user)
-//                .bookmarkCount(0)
-//                .build();
-//    }
     public static Post createPost(String cafeName, String content, User user) {
         return Post.builder()
                 .cafeName(cafeName)
