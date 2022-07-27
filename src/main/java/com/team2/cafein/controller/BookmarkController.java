@@ -2,8 +2,8 @@ package com.team2.cafein.controller;
 
 
 import com.team2.cafein.config.auth.UserDetailsImpl;
+import com.team2.cafein.dto.PostResponseDto;
 import com.team2.cafein.dto.ResponseMessageDto;
-import com.team2.cafein.model.Post;
 import com.team2.cafein.service.BookmarkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +22,7 @@ public class BookmarkController {
 
     //UserId 를  갖고 모든 북마크 포스트 갖고오기
     @GetMapping("/api/bookmark/{userId}")
-   public List<Post> getBookmarkedPost(@PathVariable Long userId) throws IOException {
+   public List<PostResponseDto> getBookmarkedPost(@PathVariable Long userId) throws IOException {
 
         return bookmarkService.getPosts(userId); //서비스의 getPosts 실행 결과값을 리턴으로 받는다. (List<post>) 의형식으로
     }
