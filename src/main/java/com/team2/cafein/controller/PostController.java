@@ -1,5 +1,6 @@
 package com.team2.cafein.controller;
 
+import com.team2.cafein.config.auth.UserDetailsImpl;
 import com.team2.cafein.dto.PostRequestDto;
 import com.team2.cafein.dto.PostResponseDto;
 import com.team2.cafein.dto.ResponseMessageDto;
@@ -9,6 +10,7 @@ import com.team2.cafein.model.User;
 import com.team2.cafein.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,7 +44,8 @@ public class PostController {
             @RequestParam String cafeName,
             @RequestParam String content,
 //            @RequestPart(value = "postRequestDto") PostRequestDto postRequestDto,
-            @RequestPart(value = "file") MultipartFile file) throws Exception {
+            @RequestPart(value = "file") MultipartFile file,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
 
         /* 파일을 업로드 하지 않았을 경우 처리 */
         if (file.isEmpty()) {
@@ -51,16 +54,15 @@ public class PostController {
             responseMessageDto.setMessage("파일 첨부는 필수입니다");
             return responseMessageDto;
         }
-//        String nickname = userDetails.getNickname();
-//        return postService.createPost(postRequestDto, nickname);
-//        return postService.createPost(postRequestDto, file);
-        return postService.createPost(cafeName, content, file);
+        Long userId = userDetails.getUser().getId();
+        return postService.createPost(cafeName, content, file, userId);
+//        return postService.createPost(cafeName, content, file);
 
     }
 
     // 게시글 수정 페이지
     @GetMapping("/api/post/{postId}/edit")
-    public UpdatePostDto updateForm(@PathVariable Long postId, Model model) {
+    public UpdatePostDto updateForm(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return postService.getUpdatePostDto(postId);
     }
 
@@ -69,6 +71,7 @@ public class PostController {
     public ResponseMessageDto updatePost(@PathVariable Long postId,
                                          @RequestPart(value = "updatePostDto") UpdatePostDto updatePostDto,
                                          @RequestPart(value = "file") MultipartFile file,
+                                         @AuthenticationPrincipal UserDetailsImpl userDetails,
                                          Model model) throws Exception{
         /* 파일을 업로드 하지 않았을 경우 처리 */
         if (file.isEmpty()) {

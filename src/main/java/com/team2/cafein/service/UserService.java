@@ -55,4 +55,11 @@ public class UserService {
         responseMessageDto.setMessage("로그인 성공");
         return responseMessageDto;
     }
+
+    public User findOne(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new NullPointerException("존재하지 않는 회원입니다.")
+        );
+        return user;
+    }
 }
