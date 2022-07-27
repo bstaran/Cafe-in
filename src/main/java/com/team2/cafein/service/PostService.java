@@ -1,15 +1,12 @@
 package com.team2.cafein.service;
 
-import com.team2.cafein.dto.PostRequestDto;
 import com.team2.cafein.dto.PostResponseDto;
 import com.team2.cafein.dto.ResponseMessageDto;
 import com.team2.cafein.dto.UpdatePostDto;
-import com.team2.cafein.model.Bookmark;
 import com.team2.cafein.model.CoffeeImg;
 import com.team2.cafein.model.Post;
 import com.team2.cafein.model.User;
 import com.team2.cafein.repository.BookmarkRepository;
-import com.team2.cafein.repository.CoffeeImgRepository;
 import com.team2.cafein.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,11 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,22 +26,22 @@ public class PostService {
     private final PostRepository postRepository;
     private final CoffeeImgService coffeeImgService;
     private final BookmarkRepository bookmarkRepository;
+    private final UserService userService;
 
     /**
      * 게시글 등록 - 해결
      */
     @Transactional
 //    public ResponseMessageDto createPost(PostRequestDto requestDto, MultipartFile file) throws IOException {
-    public ResponseMessageDto createPost(String cafeName, String content, MultipartFile file) throws IOException {
+    public ResponseMessageDto createPost(String cafeName, String content, MultipartFile file, Long userId) throws IOException {
 
         // 회원 조회
-//        User user = userService.findMemberByEmail(nickname)
-//                .orElseThrow(() -> new NullPointerException("해당 회원은 존재하지 않습니다."));
+        User user = userService.findOne(userId);
 
         // 게시글 등록
 //        Post Post = requestDto.toEntity();
 //        Post savePost = Post.createPost(Post, user);
-        Post savePost = Post.createPost(cafeName, content);
+        Post savePost = Post.createPost(cafeName, content, user);
         postRepository.save(savePost);
 
         // 게시글 이미지 등록

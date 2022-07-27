@@ -53,10 +53,10 @@ public class Post extends Timestamped {
     }
 
     @Builder
-    public Post(String cafeName, String content, int bookmarkCount) {
+    public Post(String cafeName, String content, int bookmarkCount, User user) {
         this.cafeName = cafeName;
         this.content = content;
-//        setUser(user);
+        setUser(user);
         this.bookmarkCount = bookmarkCount;
     }
 
@@ -68,11 +68,11 @@ public class Post extends Timestamped {
 //                .bookmarkCount(0)
 //                .build();
 //    }
-    public static Post createPost(String cafeName, String content) {
+    public static Post createPost(String cafeName, String content, User user) {
         return Post.builder()
                 .cafeName(cafeName)
                 .content(content)
-//                .user(user)
+                .user(user)
                 .bookmarkCount(0)
                 .build();
     }
