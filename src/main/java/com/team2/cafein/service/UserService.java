@@ -23,7 +23,6 @@ public class UserService {
     public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, JwtDecoder jwtDecoder) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.jwtDecoder = jwtDecoder;
     }
 
     @Transactional  // 요거 붙여놨습니다 -승한
