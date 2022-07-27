@@ -1,25 +1,30 @@
 package com.team2.cafein.service;
 
+import com.team2.cafein.config.auth.UserDetailsImpl;
+import com.team2.cafein.config.jwt.JwtDecoder;
 import com.team2.cafein.dto.LoginRequestDto;
 import com.team2.cafein.dto.ResponseMessageDto;
 import com.team2.cafein.dto.SignupRequestDto;
+import com.team2.cafein.dto.UserResponseDto;
 import com.team2.cafein.model.User;
 import com.team2.cafein.repository.UserRepository;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Optional;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtDecoder jwtDecoder;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, JwtDecoder jwtDecoder) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.jwtDecoder = jwtDecoder;
     }
 
     @Transactional  // 요거 붙여놨습니다 -승한
@@ -61,5 +66,12 @@ public class UserService {
                 () -> new NullPointerException("존재하지 않는 회원입니다.")
         );
         return user;
+    }
+
+    public UserResponseDto findUser(UserDetailsImpl userDetails){
+
+        System.out.println(userDetails.getUser().getNickname());
+
+        return null;
     }
 }
