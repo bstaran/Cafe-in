@@ -28,8 +28,7 @@ public class UserController {
     }
 
     @PostMapping("/user/info")
-    public UserResponseDto userInfo(@AuthenticationPrincipal String token) {
-        System.out.println(token);
-        return userService.findUser(null);
+    public UserResponseDto userInfo(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return userService.findUser(userDetails);
     }
 }
