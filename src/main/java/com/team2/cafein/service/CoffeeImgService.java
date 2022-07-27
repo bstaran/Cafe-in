@@ -84,4 +84,5 @@ public class CoffeeImgService {
     public CoffeeImg findByPost(Post post) {
         return coffeeImgRepository.findByPost(post);
     }
+    //
 }
