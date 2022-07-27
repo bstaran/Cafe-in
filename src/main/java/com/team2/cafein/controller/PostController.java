@@ -26,12 +26,12 @@ public class PostController {
     private final PostService postService;
 
     // 게시글 등록 페이지 - 프론트에서 해결
-    @GetMapping("/api/post")
-    public PostRequestDto postForm(Model model) {
-        PostRequestDto postRequestDto = new PostRequestDto();
-        model.addAttribute("postRequestDto", postRequestDto);
-        return postRequestDto;
-    }
+//    @GetMapping("/api/post")
+//    public PostRequestDto postForm(Model model) {
+//        PostRequestDto postRequestDto = new PostRequestDto();
+//        model.addAttribute("postRequestDto", postRequestDto);
+//        return postRequestDto;
+//    }
 
     // 게시글 디테일 조회 --> OK
     @GetMapping("/api/post/{postId}")
@@ -42,54 +42,49 @@ public class PostController {
     // 게시글 등록 --> OK
     @PostMapping("/api/post")
     public ResponseMessageDto createPost(
-            @RequestParam String cafeName,
-            @RequestParam String content,
-//            @RequestPart(value = "postRequestDto") PostRequestDto postRequestDto,
-            @RequestPart(value = "file") MultipartFile file,
+            @RequestBody PostRequestDto postRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
-
-        /* 파일을 업로드 하지 않았을 경우 처리 */
-        if (file.isEmpty()) {
-            ResponseMessageDto responseMessageDto = new ResponseMessageDto();
-            responseMessageDto.setStatus(false);
-            responseMessageDto.setMessage("파일 첨부는 필수입니다");
-            return responseMessageDto;
+        if (userDetails != null) {
+            Long userId = userDetails.getUser().getId();
+            return postService.createPost(postRequestDto, userId);
         }
-        Long userId = userDetails.getUser().getId();
-        return postService.createPost(cafeName, content, file, userId);
+        return new ResponseMessageDto(false, "로그인이 필요합니다.");
     }
 
     // 게시글 수정 페이지 --> 프론트에서 한다. 게시글 디테일 조회 API 활용
-    @GetMapping("/api/post/{postId}/edit")
-    public UpdatePostDto updateForm(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return postService.getUpdatePostDto(postId);
-    }
+//    @GetMapping("/api/post/{postId}/edit")
+//    public UpdatePostDto updateForm(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        return postService.getUpdatePostDto(postId);
+//    }
 
     // 게시글 수정 --> 디테일하게 코드 이해를 해야한다. cafeName이랑 content만 수정이 안된다.
     @PutMapping("/api/post/{postId}")
-    public ResponseMessageDto updatePost(@PathVariable Long postId,
-                                         @RequestPart(value = "updatePostDto") UpdatePostDto updatePostDto,
-                                         @RequestPart(value = "file") MultipartFile file,
-                                         @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception{
+    public ResponseMessageDto updatePost(
+            @PathVariable Long postId,
+            @RequestBody PostRequestDto postRequestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
 
-        Long userId = userDetails.getUser().getId();
-        /* 파일을 업로드 하지 않았을 경우 처리 */
-        if (file.isEmpty()) {
-            UpdatePostDto.PostImageDto postImageDto = postService.getPostImageDto(postId);
-            updatePostDto.setPostImageDto(postImageDto);
+        if (userDetails != null) {
+            Long userId = userDetails.getUser().getId();
+            postService.updatePost(postRequestDto, postId, userId);
         }
-        try {
-            postService.updatePost(updatePostDto, file);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-//            bindingResult.reject("globalError", "상품 수정 중 에러가 발생하였습니다.");
-//            return "adminitem/updateitemform";
-        }
-        ResponseMessageDto responseMessageDto = new ResponseMessageDto();
-        responseMessageDto.setStatus(true);
-        responseMessageDto.setMessage("게시글 !! 수정 !! 성공");
-        return responseMessageDto;
+        return new ResponseMessageDto(false, "로그인이 필요합니다.");
     }
+//        /* 파일을 업로드 하지 않았을 경우 처리 */
+//        if (file.isEmpty()) {
+//            UpdatePostDto.PostImageDto postImageDto = postService.getPostImageDto(postId);
+//            updatePostDto.setPostImageDto(postImageDto);
+//        }
+//        try {
+//            postService.updatePost(postRequestDto, postId, userId);
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//        }
+//        ResponseMessageDto responseMessageDto = new ResponseMessageDto();
+//        responseMessageDto.setStatus(true);
+//        responseMessageDto.setMessage("게시글 !! 수정 !! 성공");
+//        return responseMessageDto;
+//    }
 
     // 게시글 삭제 --> OK
     // PropertyValueException : not-null property references a null or transient value
@@ -97,15 +92,18 @@ public class PostController {
     @DeleteMapping("/api/post/{postId}")
     public ResponseMessageDto deletePost(@PathVariable Long postId,
                                          @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
-        String nickname = userDetails.getUser().getNickname();
-        return postService.deletePost(postId, nickname);
+        if (userDetails != null) {
+            String nickname = userDetails.getUser().getNickname();
+            return postService.deletePost(postId, nickname);
+        }
+        return new ResponseMessageDto(false, "로그인이 필요합니다.");
     }
 
     // 게시글 전체 조회 --> OK
     @GetMapping("/api/posts")
-    public List<PostResponseDto> getPosts() {
-        // Response 용 Dto를 만들어서 보내주자
-        return postService.getPosts();
+    public List<PostResponseDto> getPosts(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long userId = userDetails.getUser().getId();
+        return postService.getPosts(userId);
     }
 
     // 내가 올린 게시글 조회 -- 오류

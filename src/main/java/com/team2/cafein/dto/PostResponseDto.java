@@ -1,8 +1,10 @@
 package com.team2.cafein.dto;
 
 import com.team2.cafein.model.Post;
+import com.team2.cafein.repository.BookmarkRepository;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +24,8 @@ public class PostResponseDto {
     private String imageUrl;
 
     @Builder
-    public PostResponseDto(Post post, String imageUrl) {
+    public PostResponseDto(Post post, String imageUrl, Boolean bookMark) {
+
         this.id = post.getId();
         this.nickName = post.getUser().getNickname();
         this.createdAt = post.getCreatedAt();
@@ -32,4 +35,14 @@ public class PostResponseDto {
         this.bookMark = true;
         this.imageUrl = imageUrl;
     }
+
+//    public static PostResponseDto of(Post post, String imageUrl) {
+//
+//        PostResponseDto postResponseDto = PostResponseDto.builder()
+//                .post(post)
+//                .imageUrl(imageUrl)
+//                .build();
+//
+//        return postResponseDto;
+//    }
 }

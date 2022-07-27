@@ -25,49 +25,48 @@ public class Post extends Timestamped {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
+    private String imageUrl;
+
     private int bookmarkCount;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(mappedBy = "post")
-    private CoffeeImg coffeeImg;
+//    @OneToOne(mappedBy = "post")
+//    private CoffeeImg coffeeImg;
 
     //== 연관관계 (편의) 메서드==// 양방향 연관관계 세팅을 까먹지않고 할수있는 장점
     public void setUser(User user) {
         this.user = user;
         user.getPosts().add(this);
     }
-
-    public void setCoffeeImg(CoffeeImg coffeeImg) {
-        this.coffeeImg = coffeeImg;
-    }
-
     // 북마크 증가
     public void addCount() {
         this.bookmarkCount++;
     }
 
     @Builder
-    public Post(String cafeName, String content, int bookmarkCount, User user) {
+    public Post(String cafeName, String content, int bookmarkCount, String imageUrl, User user) {
         this.cafeName = cafeName;
         this.content = content;
+        this.imageUrl = imageUrl;
         setUser(user);
         this.bookmarkCount = bookmarkCount;
     }
-    public static Post createPost(String cafeName, String content, User user) {
+    public static Post createPost(PostRequestDto postRequestDto, User user) {
         return Post.builder()
-                .cafeName(cafeName)
-                .content(content)
+                .cafeName(postRequestDto.getCafeName())
+                .content(postRequestDto.getContent())
+                .imageUrl(postRequestDto.getImageUrl())
                 .user(user)
                 .bookmarkCount(0)
                 .build();
     }
 
-    public void updatePost(Post updatePost) {
-        this.cafeName = updatePost.getCafeName();
-        this.content = updatePost.getContent();
-        this.bookmarkCount = updatePost.getBookmarkCount();
+    public void updatePost(PostRequestDto postRequestDto) {
+        this.cafeName = postRequestDto.getCafeName();
+        this.content = postRequestDto.getContent();
+        this.imageUrl = postRequestDto.getImageUrl();
     }
-    //
 }
