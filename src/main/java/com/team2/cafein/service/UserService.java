@@ -70,8 +70,9 @@ public class UserService {
 
     public UserResponseDto findUser(UserDetailsImpl userDetails){
 
-        System.out.println(userDetails.getUser().getNickname());
-
-        return null;
+        UserResponseDto userResponseDto = new UserResponseDto();
+        userResponseDto.setEmail(userDetails.getUser().getEmail());
+        userResponseDto.setNickname(userDetails.getUser().getNickname());
+        return userResponseDto;
     }
 }
