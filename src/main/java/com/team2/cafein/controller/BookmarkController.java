@@ -21,11 +21,15 @@ public class BookmarkController {
     private final BookmarkService bookmarkService;
 
     //UserId 를  갖고 모든 북마크 포스트 갖고오기
-    @GetMapping("/api/bookmark/{userId}")
-   public List<Post> getBookmarkedPost(@PathVariable Long userId) throws IOException {
+    // 승한 메모 to 태현
+    // http://localhost:8080/api/bookmark/2 뒤에 숫자가 userId인지 postId인지 알수 없기때문에
+    // Ambiguous handler methods mapped for... 라는 에러 메세지 발생합니당
 
-        return bookmarkService.getPosts(userId); //서비스의 getPosts 실행 결과값을 리턴으로 받는다. (List<post>) 의형식으로
-    }
+//    @GetMapping("/api/bookmark/{userId}")
+//   public List<Post> getBookmarkedPost(@PathVariable Long userId) throws IOException {
+//
+//        return bookmarkService.getPosts(userId); //서비스의 getPosts 실행 결과값을 리턴으로 받는다. (List<post>) 의형식으로
+//    }
 //북마크  저장하기 북마크 버튼을 누른 사용자디테일에서 userId를 갖고와서 그걸 postId 와 함께 북마크로 저장
     @GetMapping("/api/bookmark/{postId}")
     public ResponseMessageDto savePost(@PathVariable Long postId,@AuthenticationPrincipal UserDetailsImpl userDetails){

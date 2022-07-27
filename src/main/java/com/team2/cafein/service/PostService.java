@@ -87,7 +87,7 @@ public class PostService {
      * 게시글 수정 - 해결
      */
     @Transactional
-    public ResponseMessageDto updatePost(PostRequestDto postRequestDto, Long postId, Long userId) throws IOException {
+    public ResponseMessageDto updatePost(PostRequestDto postRequestDto, Long postId, String nickName) throws IOException {
         // 게시글 업데이트
 //        Post post = updatePostInfo(updatePostDto);
 //        // 커피 이미지 업데이트
@@ -96,7 +96,7 @@ public class PostService {
 
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new NullPointerException("존재하지 않는 게시판압니다"));
-        if (Objects.equals(post.getId(), userId)) {
+        if (Objects.equals(post.getUser().getNickname(), nickName)) {
             // 수정 로직
             post.updatePost(postRequestDto);
             return new ResponseMessageDto(true, "게시글 수정 성공");
@@ -170,7 +170,6 @@ public class PostService {
 
         // 로그인 되어있는 userId로 Bookmark 테이블에서 select로 리스트 배열 받아오기
 //        List<Bookmark> bookmarks = bookmarkRepository.findAllByUserId(userId);
-        List<Long> bookmarkedPostIds = bookmarkRepository.findAllPostIdsByUserId(userId);
 
         // 접속한 유저가 북마크한 Post의 리스트
 //        List<Long> responsePosts = new ArrayList<>();   // 여기는 응답할 게시글 목록을 위한 리스트 선언
@@ -181,13 +180,15 @@ public class PostService {
 //                    .orElseThrow(() -> new NullPointerException("ID값 확인해주세여"));
 //            responsePosts.add(post.getId());
 //        }
+        List<Long> bookmarkedPostIds = bookmarkRepository.findPostIdsByUserId(userId);
 
         // 전체 게시글을 작성시간 순서로 추출
         List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
 
         // 프론트에 보내줄 Dto 리스트
         List<PostResponseDto> listPost = new ArrayList<>();
-        Boolean bookMark = true;
+
+        Boolean bookMark = false;
         for (Post post : posts) {
 
 //            for (Long bookmarkedPostId : bookmarkedPostIds) {
@@ -212,8 +213,8 @@ public class PostService {
 //                }
 //            }
             for (Long bookmarkedPostId : bookmarkedPostIds) {
-                if (bookmarkedPostId != post.getId()) {
-                    bookMark = false;
+                if (bookmarkedPostId == post.getId()) {
+                    bookMark = true;
                     break;
                 }
             }

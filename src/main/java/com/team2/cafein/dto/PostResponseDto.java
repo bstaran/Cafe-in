@@ -1,10 +1,8 @@
 package com.team2.cafein.dto;
 
 import com.team2.cafein.model.Post;
-import com.team2.cafein.repository.BookmarkRepository;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -32,7 +30,7 @@ public class PostResponseDto {
         this.cafeName = post.getCafeName();
         this.content = post.getContent();
         this.bookmarkCount = post.getBookmarkCount();
-        this.bookMark = true;
+        this.bookMark = bookMark;
         this.imageUrl = imageUrl;
     }
 

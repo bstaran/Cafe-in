@@ -57,16 +57,17 @@ public class PostController {
 //        return postService.getUpdatePostDto(postId);
 //    }
 
-    // 게시글 수정 --> 디테일하게 코드 이해를 해야한다. cafeName이랑 content만 수정이 안된다.
+    // 게시글 수정 --> OK
     @PutMapping("/api/post/{postId}")
     public ResponseMessageDto updatePost(
             @PathVariable Long postId,
             @RequestBody PostRequestDto postRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
+        System.out.println(userDetails.getUsername());
 
         if (userDetails != null) {
-            Long userId = userDetails.getUser().getId();
-            postService.updatePost(postRequestDto, postId, userId);
+            String nickname = userDetails.getUser().getNickname();
+            return postService.updatePost(postRequestDto, postId, nickname);
         }
         return new ResponseMessageDto(false, "로그인이 필요합니다.");
     }
@@ -106,7 +107,7 @@ public class PostController {
         return postService.getPosts(userId);
     }
 
-    // 내가 올린 게시글 조회 -- 오류
+    // 내가 올린 게시글 조회 --> OK
     @GetMapping("/api/post/myposts")
     public List<Post> getMyPosts(@AuthenticationPrincipal UserDetailsImpl userDetails) {
 //  Resolved [org.springframework.http.converter.HttpMessageNotWritableException: Could not write JSON: failed to lazily initialize a collection of role: com.team2.cafein.model.User.posts, could not initialize proxy - no Session; nested exception is com.fasterxml.jackson.databind.JsonMappingException:

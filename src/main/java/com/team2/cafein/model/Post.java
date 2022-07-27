@@ -1,5 +1,6 @@
 package com.team2.cafein.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.team2.cafein.base.Timestamped;
 import com.team2.cafein.dto.PostRequestDto;
 import lombok.AccessLevel;
@@ -29,6 +30,7 @@ public class Post extends Timestamped {
     private String imageUrl;
 
     private int bookmarkCount;
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
