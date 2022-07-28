@@ -3,22 +3,18 @@ package com.team2.cafein.service;
 import com.team2.cafein.dto.PostRequestDto;
 import com.team2.cafein.dto.PostResponseDto;
 import com.team2.cafein.dto.ResponseMessageDto;
-import com.team2.cafein.dto.UpdatePostDto;
 import com.team2.cafein.model.Bookmark;
-import com.team2.cafein.model.CoffeeImg;
 import com.team2.cafein.model.Post;
 import com.team2.cafein.model.User;
 import com.team2.cafein.repository.BookmarkRepository;
-import com.team2.cafein.repository.CoffeeImgRepository;
 import com.team2.cafein.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,8 +24,6 @@ import java.util.Objects;
 public class PostService {
 
     private final PostRepository postRepository;
-    //    private final CoffeeImgRepository coffeeImgRepository;
-//    private final CoffeeImgService coffeeImgService;
     private final BookmarkRepository bookmarkRepository;
     private final UserService userService;
 
@@ -137,18 +131,15 @@ public class PostService {
      * 게시글 삭제 - 해결
      */
     @Transactional
-    public ResponseMessageDto deletePost(Long postId, String userName) throws IOException {
+    public ResponseMessageDto deletePost(Long postId, String loginNickName) throws IOException {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
 //        CoffeeImg coffeeImg = coffeeImgService.findByPost(post);
-//        System.out.println("coffeeImg : " + coffeeImg); // ok
 
-        String nickName = post.getUser().getNickname();
-//        System.out.println("nickName : " + nickName); // ok
-//        System.out.println("userName : " + userName); // ok
+        String userNickName = post.getUser().getNickname();
 
-        if (Objects.equals(nickName, userName)) {
+        if (Objects.equals(userNickName, loginNickName)) {
             // 삭제
 //            coffeeImgService.deletePostImage(coffeeImg);
 //            coffeeImgRepository.deleteById(coffeeImg.getId());
@@ -157,66 +148,64 @@ public class PostService {
 
         } else new IllegalArgumentException("작성한 유저가 아닙니다.");
 
-        ResponseMessageDto responseMessageDto = new ResponseMessageDto();
-        responseMessageDto.setStatus(true);
-        responseMessageDto.setMessage("게시글 삭제 성공");
-        return responseMessageDto;
+        return new ResponseMessageDto(true, "게시글 삭제 성공");
     }
 
     /**
-     * 전체 게시글 조회 - ResponseDto 를 따로 만들어서 담고 보내준다.
+     * 전체 게시글 조회 - 하나를 북마크 하면 로그인한 유저 ID로 등록한 게시글들이 다 북마크가 true로 바뀌는 문제
+     * 북마크에 추가되는 칼럼은 하나이다.
+     * 123456 중에서 3번을 북마크하면 123이 다 북마크된다.
      */
     public List<PostResponseDto> getPosts(Long userId) {
-
-        // 로그인 되어있는 userId로 Bookmark 테이블에서 select로 리스트 배열 받아오기
-//        List<Bookmark> bookmarks = bookmarkRepository.findAllByUserId(userId);
-
-        // 접속한 유저가 북마크한 Post의 리스트
-//        List<Long> responsePosts = new ArrayList<>();   // 여기는 응답할 게시글 목록을 위한 리스트 선언
-//
-//        for (Bookmark bookmark : bookmarks) { //for 문을 돌리면서 POST ID 에 대응되는 post의 내용을 List<post> 에 담아서 리턴
-//            Long postId = bookmark.getPostId();
-//            Post post = postRepository.findById(postId)
-//                    .orElseThrow(() -> new NullPointerException("ID값 확인해주세여"));
-//            responsePosts.add(post.getId());
-//        }
-        List<Long> bookmarkedPostIds = bookmarkRepository.findPostIdsByUserId(userId);
-
         // 전체 게시글을 작성시간 순서로 추출
-        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
+        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc(); // OK
+        return getPostResponseDtoList(posts, userId);
+    }
 
-        // 프론트에 보내줄 Dto 리스트
-        List<PostResponseDto> listPost = new ArrayList<>();
+    /**
+     * 내가 올린 게시글 조회
+     */
+    public List<PostResponseDto> getMyPosts(User user) {
+//        List<Post> myPosts = postRepository.findAllByUserByOrderByCreatedAtDesc(user); // X
 
-        Boolean bookMark = false;
+        // 내가 올린 게시글을 작성시간 순서로 추출
+        List<Post> myPosts = postRepository.findByUserOrderByCreatedAtDesc(user); // OK
+        List<PostResponseDto> postResponseDtoResult = getPostResponseDtoList(myPosts, user.getId());
+        return postResponseDtoResult;
+    }
+
+    // 응답 리스트 만드는 메소드
+    private List<PostResponseDto> getPostResponseDtoList(List<Post> posts, Long userId) {
+
+        // 접속한 사용자가 북마크한 Bookmark 리스트 얻어오기
+        List<Bookmark> bookmarks = bookmarkRepository.findAllByUserId(userId); // OK
+
+        // 접속한 사용자가 북마크한 Bookmark의 게시글 ID 리스트 만들기
+//        List<Long> bookmarkedPostIds = new ArrayList<>();
+        HashSet<Long> bookmarkedPostIds = new HashSet<>();
+        for (Bookmark bookmark : bookmarks) {
+//            bookmarkedPostIds.add(bookmark.getPostId());
+            bookmarkedPostIds.add(bookmark.getPostId());
+        }
+
+        Boolean bookMark;
+
+        // 프론트에 보내줄 빈 객체 선언
+        List<PostResponseDto> postResponseDtos = new ArrayList<>();
+        //---------------------------------------------------------//
         for (Post post : posts) {
-
 //            for (Long bookmarkedPostId : bookmarkedPostIds) {
+//                // 여기 부분에서 같은 숫자가 맞으면 변하는건 맞는데, 그때 true이 변하지 않고
+//                // 계속 true로 유지가 되서 4번을 북마크하면 2번3번까지 true로 변하는것 같습니다
 //                if (bookmarkedPostId == post.getId()) {
-//                    String imageUrl = post.getImageUrl();
-//                    PostResponseDto postResponseDto = PostResponseDto.builder()
-//                            .post(post)
-//                            .imageUrl(imageUrl)
-//                            .bookMark(bookMark)
-//                            .build();
-//                    listPost.add(postResponseDto);
-//                    break;
-//                } else {
-//                    bookMark = false;
-//                    String imageUrl = post.getImageUrl();
-//                    PostResponseDto postResponseDto = PostResponseDto.builder()
-//                            .post(post)
-//                            .imageUrl(imageUrl)
-//                            .bookMark(bookMark)
-//                            .build();
-//                    listPost.add(postResponseDto);
+//                    bookMark = true;
+////                    break;
 //                }
 //            }
-            for (Long bookmarkedPostId : bookmarkedPostIds) {
-                if (bookmarkedPostId == post.getId()) {
-                    bookMark = true;
-                    break;
-                }
+            if (bookmarkedPostIds.contains(post.getId())) {
+                bookMark = true;
+            } else {
+                bookMark = false;
             }
             String imageUrl = post.getImageUrl();
             PostResponseDto postResponseDto = PostResponseDto.builder()
@@ -224,20 +213,14 @@ public class PostService {
                     .imageUrl(imageUrl)
                     .bookMark(bookMark)
                     .build();
-            listPost.add(postResponseDto);
+            postResponseDtos.add(postResponseDto);
         }
-        return listPost;
+        //---------------------------------------------------------//
+        return postResponseDtos;
     }
 
     /**
-     * 내가 올린 게시글 조회 - 만져야함
-     */
-    public List<Post> getMyPosts(User user) {
-        return postRepository.findAllByUser(user);
-    }
-
-    /**
-     * 게시글 디테일 조회 - 해결
+     * 게시글 디테일 조회 - true 고정값이 아니라 북마크가 맞는지 확인해야함
      */
     public PostResponseDto findOne(Long postId) {
 
@@ -248,6 +231,7 @@ public class PostService {
         PostResponseDto postResponseDto = PostResponseDto.builder()
                 .post(post)
                 .imageUrl(post.getImageUrl())
+                .bookMark(true)
                 .build();
         return postResponseDto;
     }
