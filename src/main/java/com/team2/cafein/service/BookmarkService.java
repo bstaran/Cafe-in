@@ -39,9 +39,9 @@ public class BookmarkService {
 //    }
 
     public List<PostResponseDto> getPosts(Long userId) {
-
+        //북마크된 포스트 아이디 찾기 (userId로)
         List<Bookmark> bookmarks = bookmarkRepository.findByUserId(userId);
-
+        //찾은 postId 로 post 찾아 리스트로 저장
         List<Post> bookmarkPosts = new ArrayList<>();
                 for (Bookmark bookmark : bookmarks) {
                     Long postId = bookmark.getPostId();
@@ -49,19 +49,21 @@ public class BookmarkService {
                             .orElseThrow(() -> new NullPointerException("ID값 확인해주세요"));
                     bookmarkPosts.add(post);
                 }
-
+        //post 위의 포스트 리스트를 리스폰스Dto 형식에 맞게 데이터 get하여 리스트로 저장
         List<Post> posts;
         posts = bookmarkPosts;
         List<PostResponseDto> listPost = new ArrayList<>();
+        Boolean bookMark = true;
         for (Post post : posts) {
             String imageUrl = post.getImageUrl();
             PostResponseDto postResponseDto = PostResponseDto.builder()
                     .post(post)
                     .imageUrl(imageUrl)
+                    .bookMark(bookMark)
                     .build();
             listPost.add(postResponseDto);
         }
-        return listPost;
+        return listPost;  //컨트롤러로 리턴
     }
 
     public ResponseMessageDto savePost(Long userId, Long postId) {
