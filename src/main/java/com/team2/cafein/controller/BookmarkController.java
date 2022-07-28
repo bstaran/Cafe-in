@@ -33,9 +33,10 @@ public class BookmarkController {
         return bookmarkService.savePost(userId,postId);
     }
 //북마크 삭제 bookmarkId 값으로 북마크 삭제
-    @DeleteMapping("/api/bookmark/{bookmarkId}")
-    public ResponseMessageDto deleteBookmark(@PathVariable Long bookmarkId)  {
-        return bookmarkService.deleteBookmark(bookmarkId);
+    @DeleteMapping("/api/bookmark/{postId}")
+    public ResponseMessageDto deleteBookmark(@PathVariable Long postId,@AuthenticationPrincipal UserDetailsImpl userDetails)  {
+        Long userId = userDetails.getUser().getId();
+        return bookmarkService.deleteBookmark(userId,postId);
     }
 }
 // 북마크 보기. = POST ID 의 리스트를 주는것이 아니고 for 문을 돌려서 POST 데이터를 주어야한다.
