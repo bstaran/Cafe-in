@@ -42,14 +42,15 @@ public class BookmarkService {
     public List<PostResponseDto> getPosts(Long userId) {
         //북마크된 포스트 아이디 찾기 (userId로)
         List<Bookmark> bookmarks = bookmarkRepository.findByUserId(userId);
+
         //찾은 postId 로 post 찾아 리스트로 저장
         List<Post> bookmarkPosts = new ArrayList<>();
-                for (Bookmark bookmark : bookmarks) {
-                    Long postId = bookmark.getPostId();
-                    Post post = postRepository.findById(postId)
-                            .orElseThrow(() -> new NullPointerException("ID값 확인해주세요"));
-                    bookmarkPosts.add(post);
-                }
+        for (Bookmark bookmark : bookmarks) {
+            Long postId = bookmark.getPostId();
+            Post post = postRepository.findById(postId)
+                    .orElseThrow(() -> new NullPointerException("ID값 확인해주세요"));
+            bookmarkPosts.add(post);
+        }
         //post 위의 포스트 리스트를 리스폰스Dto 형식에 맞게 데이터 get하여 리스트로 저장
         List<Post> posts;
         posts = bookmarkPosts;
@@ -95,17 +96,17 @@ public class BookmarkService {
             }
             // ---------------------------
 
-            // 응답 객체 만들기
-            ResponseMessageDto responseMessageDto = new ResponseMessageDto();
-            responseMessageDto.setStatus(true);
-            if (responseMessageDto.isStatus()) {
-                responseMessageDto.setMessage("등록성공");
-            } else {
-                responseMessageDto.setMessage("등록실패");
+        // 응답 객체 만들기
+        ResponseMessageDto responseMessageDto = new ResponseMessageDto();
+        responseMessageDto.setStatus(true);
+        if (responseMessageDto.isStatus()) {
+            responseMessageDto.setMessage("등록성공");
+        } else {
+            responseMessageDto.setMessage("등록실패");
 
-            }
-            return responseMessageDto;
         }
+        return responseMessageDto;
     }
+}
 
 
