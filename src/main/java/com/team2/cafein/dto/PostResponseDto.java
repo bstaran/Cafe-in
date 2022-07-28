@@ -12,13 +12,11 @@ public class PostResponseDto {
     private Long id;
 
     private String nickName;
-
-    private LocalDateTime createdAt;
-
     private String cafeName;
     private String content;
     private int bookmarkCount;
     private Boolean bookMark;
+    private LocalDateTime createdAt;
     private String imageUrl;
 
     @Builder
@@ -33,14 +31,4 @@ public class PostResponseDto {
         this.bookMark = bookMark;
         this.imageUrl = imageUrl;
     }
-
-//    public static PostResponseDto of(Post post, String imageUrl) {
-//
-//        PostResponseDto postResponseDto = PostResponseDto.builder()
-//                .post(post)
-//                .imageUrl(imageUrl)
-//                .build();
-//
-//        return postResponseDto;
-//    }
 }

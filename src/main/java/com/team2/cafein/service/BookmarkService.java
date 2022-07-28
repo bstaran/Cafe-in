@@ -55,22 +55,22 @@ public class BookmarkService {
         return responseMessageDto;
     }
 
-        public ResponseMessageDto deleteBookmark (Long bookmarkId){
-            // 비지니스 로직 구간
-            bookmarkRepository.deleteById(bookmarkId);
-            // ---------------------------
+    public ResponseMessageDto deleteBookmark(Long bookmarkId) {
+        // 비지니스 로직 구간
+        bookmarkRepository.deleteById(bookmarkId);
+        // ---------------------------
 
-            // 응답 객체 만들기
-            ResponseMessageDto responseMessageDto = new ResponseMessageDto();
-            responseMessageDto.setStatus(true);
-            if (responseMessageDto.isStatus()) {
-                responseMessageDto.setMessage("등록성공");
-            } else {
-                responseMessageDto.setMessage("등록실패");
+        // 응답 객체 만들기
+        ResponseMessageDto responseMessageDto = new ResponseMessageDto();
+        responseMessageDto.setStatus(true);
+        if (responseMessageDto.isStatus()) {
+            responseMessageDto.setMessage("등록성공");
+        } else {
+            responseMessageDto.setMessage("등록실패");
 
-            }
-            return responseMessageDto;
         }
+        return responseMessageDto;
     }
+}
 
 
