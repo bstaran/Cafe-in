@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.awt.print.Book;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,9 +87,12 @@ public class BookmarkService {
         public ResponseMessageDto deleteBookmark (Long userId, Long postId){
             // 비지니스 로직 구간
 
-            Long bookmarkId = bookmarkRepository.findIdByPostIdAndUserId(userId, postId);
+            List<Bookmark> bookmarkIds = bookmarkRepository.findByPostIdAndUserId(userId, postId);
 
-            bookmarkRepository.deleteById(bookmarkId);
+            for(Bookmark bookmarkId :bookmarkIds) {
+                Long bookmarkedId = bookmarkId.getId();
+                bookmarkRepository.deleteById(bookmarkedId);
+            }
             // ---------------------------
 
             // 응답 객체 만들기
