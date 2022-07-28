@@ -83,8 +83,11 @@ public class BookmarkService {
         return responseMessageDto;
     }
 
-        public ResponseMessageDto deleteBookmark (Long bookmarkId){
+        public ResponseMessageDto deleteBookmark (Long userId, Long postId){
             // 비지니스 로직 구간
+
+            Long bookmarkId = bookmarkRepository.findIdByPostIdAndUserId(userId, postId);
+
             bookmarkRepository.deleteById(bookmarkId);
             // ---------------------------
 
