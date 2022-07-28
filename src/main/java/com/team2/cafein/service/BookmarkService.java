@@ -85,16 +85,27 @@ public class BookmarkService {
         return responseMessageDto;
     }
 
-        public ResponseMessageDto deleteBookmark (Long userId, Long postId){
-            // 비지니스 로직 구간
+    public ResponseMessageDto deleteBookmark(Long userId, Long postId) {
+        // 비지니스 로직 구간
+        //북마크된 포스트 아이디 찾기 (userId로)
+        // 1
+        List<Bookmark> bookmarks = bookmarkRepository.findByUserId(userId);
 
-            List<Bookmark> bookmarkIds = bookmarkRepository.findByPostIdAndUserId(userId, postId);
-
-            for(Bookmark bookmarkId :bookmarkIds) {
-                Long bookmarkedId = bookmarkId.getId();
-                bookmarkRepository.deleteById(bookmarkedId);
+        // 2. 4:1 2:1 6:1 7:1
+        for (Bookmark bookmark : bookmarks) {
+            if (bookmark.getPostId() == postId) {
+                bookmarkRepository.deleteById(bookmark.getId());
             }
-            // ---------------------------
+        }
+
+//        List<Bookmark> bookmarks = bookmarkRepository.findByUserIdAndPostId(userId,postId);
+//        for (Bookmark bookmark : bookmarks) {
+//            Long bookmarkId = bookmark.getId(); // 여기여? 네 bookmarkID 가 나와여 잠시만여
+//            bookmarkRepository.deleteById(bookmarkId);
+//        }
+        // --------------------------- 네?? 그렇게 되면 userid 같은 놈들 다 나와서 그거 get id 하면
+        // 그사람 이갖고있는 모든 북마크 해제 되는거 아닌가요 ?? 아 맞네여 흠.........
+        //  저기서 getId 하면 bookmarkId  가 나오는게 맞죠 ?
 
         // 응답 객체 만들기
         ResponseMessageDto responseMessageDto = new ResponseMessageDto();
