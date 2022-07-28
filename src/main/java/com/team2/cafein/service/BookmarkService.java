@@ -54,7 +54,7 @@ public class BookmarkService {
         posts = bookmarkPosts;
         List<PostResponseDto> listPost = new ArrayList<>();
         for (Post post : posts) {
-            String imageUrl = post.getCoffeeImg().getImageUrl();
+            String imageUrl = post.getImageUrl();
             PostResponseDto postResponseDto = PostResponseDto.builder()
                     .post(post)
                     .imageUrl(imageUrl)

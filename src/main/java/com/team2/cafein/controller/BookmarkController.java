@@ -21,9 +21,9 @@ public class BookmarkController {
     private final BookmarkService bookmarkService;
 
     //UserId 를  갖고 모든 북마크 포스트 갖고오기
-    @GetMapping("/api/bookmark/{userId}")
-   public List<PostResponseDto> getBookmarkedPost(@PathVariable Long userId) throws IOException {
-
+    @GetMapping("/api/bookmark/")
+   public List<PostResponseDto> getBookmarkedPost(@AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+        Long userId = userDetails.getUser().getId();
         return bookmarkService.getPosts(userId); //서비스의 getPosts 실행 결과값을 리턴으로 받는다. (List<post>) 의형식으로
     }
 //북마크  저장하기 북마크 버튼을 누른 사용자디테일에서 userId를 갖고와서 그걸 postId 와 함께 북마크로 저장
